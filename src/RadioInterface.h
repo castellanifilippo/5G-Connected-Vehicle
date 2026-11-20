@@ -13,8 +13,12 @@ private:
     cQueue packetQueue; // Queue to hold packets waiting to be sent
     cMessage *endTransmissionEvent; // Self-message to indicate the end of a transmission
     bool isBusy; // Flag to indicate if the radio interface is currently busy transmitting
-    // Function to send a packet to the BS
+    // Function that handles incoming VehiclePacket messages incoming
     void handlePacket(VehiclePacket *packet);
+    // After a transmission send packet in the queue or set not busy
+    void endTransmission();
+    // Function to transmit a packet and hadle trasmission time
+    void transmitPacket(VehiclePacket *packet);
 
 protected:
     virtual void initialize() override;

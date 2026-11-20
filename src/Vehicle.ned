@@ -9,5 +9,5 @@ module Vehicle
             @display("p=100,100");
         }
     connections:
-        radioInterface.antennaIO <--> wirelessGate;
+        radioInterface.in <-- wirelessGate;
 }
