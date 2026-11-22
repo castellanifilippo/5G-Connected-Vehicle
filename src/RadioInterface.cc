@@ -6,6 +6,10 @@ Define_Module(RadioInterface);
 
 void RadioInterface::initialize()
 {
+    L = par("L").doubleValue();
+    N = par("N").intValue();
+    BSRoadOffset = par("BS-road-offset").doubleValue();
+    alpha = par("propagation.alpha").doubleValue();
     // Initialize the packet queue and the end transmission event
     packetQueue.setName("vehicleQueue");
     endTransmissionEvent = new cMessage("endTransmissionEvent");
@@ -60,8 +64,19 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
 {   
     isBusy = true;
     // Get the distance to the base station from the mobility system
-    //TODO
-    double transmissionTime = 0.1;  //TODO
+    MobilitySystem *mobilitySystem = check_and_cast<MobilitySystem *>(getParentModule()->getSubmodule("mobilitySystem"));
+    if (!mobilitySystem) {
+        throw cRuntimeError("[Vehicle:RI]: MobilitySystem submodule not found");
+    }
+    double position = mobilitySystem->getPosition();
+    double currentBSPosition = mobilitySystem->getIdBS() * (L / N);
+    double distance = std::abs(position - currentBSPosition);
+    // Need to account the distance from the road to the base station
+    distance = std::sqrt(distance * distance + BSRoadOffset * BSRoadOffset);
+
+    // Calculate the transmission time based on the distance to the base station S = alpha * distance^2
+    double transmissionTime = alpha * distance * distance;
+
     // Send the packet to the base station through the antenna output
     sendDirect(packet, transmissionTime, "antenna$o");
     // Schedule the end transmission event after the transmission time
