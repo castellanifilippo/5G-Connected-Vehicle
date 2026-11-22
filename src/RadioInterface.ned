@@ -6,7 +6,10 @@ simple RadioInterface
         double L @unit(m); // Highway length
         int N; // Number of BS
         double BSRoadOffset @unit(m); // Distance from the road to the base station
-        double alpha @unit(s/m^2); // Proportionality constant for the propagation model
+        double alpha; // Proportionality constant for the propagation model
+        @signal[queueLength](type=int);
+        @statistic[queueLength](title="length of the queue in the radio interface"; 
+                                interpolation==sampleHold; record=timeavg, max, vector);
     gates:
         input in; // Gate to communicate with the BaseStation
         input applicationIn; // Gate to communicate with the Application

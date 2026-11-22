@@ -1,10 +1,9 @@
 #include "ApplicationServer.h"
+#include "VehiclePacket_m.h"
 
 namespace _5g_connectedvehicle {
 
 Define_Module(ApplicationServer);
-
-}
 
 void ApplicationServer::initialize()
 {   
@@ -22,4 +21,6 @@ void ApplicationServer::handleMessage(cMessage *msg)
     // emit the new end-to-end delay signal
     emit(endToEndDelaySig, simTime() - pkt->getGenTime());
     delete pkt;
+}
+
 }

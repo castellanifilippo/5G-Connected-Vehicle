@@ -1,3 +1,4 @@
+namespace _5g_connectedvehicle;
 
 enum PacketType
 {
@@ -10,6 +11,6 @@ packet VehiclePacket
 {
     PacketType type;
     simtime_t genTime;  // Generation time of the packet
-    double genTImePosition; // Position of the vehicle when the packet was generated
+    double genTimePosition; // Position of the vehicle when the packet was generated
     int currentBS;  // Current base station of the vehicle
 }

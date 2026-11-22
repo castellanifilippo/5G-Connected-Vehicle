@@ -6,5 +6,5 @@ simple MobilityServer
     parameters:
         @display("i=device/server2;is=s");
     gates:
-        inout io;
+        inout io[];
 }

@@ -2,6 +2,7 @@
 #define ___5G_CONNECTEDVEHICLE_RADIOINTERFACE_H_
 
 #include <omnetpp.h>
+#include "VehiclePacket_m.h"
 
 using namespace omnetpp;
 
@@ -23,6 +24,7 @@ private:
     void endTransmission();
     // Function to transmit a packet and hadle trasmission time
     void transmitPacket(VehiclePacket *packet);
+    simsignal_t queueLengthSignal; // Signal to record the length of the packet queue
 
 protected:
     virtual void initialize() override;

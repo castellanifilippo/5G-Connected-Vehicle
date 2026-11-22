@@ -1,4 +1,7 @@
 #include "RadioInterface.h"
+#include "MobilitySystem.h"
+#include "HandoverResponse_m.h"
+#include "VehiclePacket_m.h"
 
 namespace _5g_connectedvehicle {
 
@@ -8,12 +11,15 @@ void RadioInterface::initialize()
 {
     L = par("L").doubleValue();
     N = par("N").intValue();
-    BSRoadOffset = par("BS-road-offset").doubleValue();
-    alpha = par("propagation.alpha").doubleValue();
+    BSRoadOffset = par("BSRoadOffset").doubleValue();
+    alpha = par("alpha").doubleValue();
     // Initialize the packet queue and the end transmission event
     packetQueue.setName("vehicleQueue");
     endTransmissionEvent = new cMessage("endTransmissionEvent");
     isBusy = false;
+    // Register the queue length signal
+    queueLengthSignal = registerSignal("queueLength");
+    emit(queueLengthSignal, packetQueue.getLength());
 }
 
 void RadioInterface::handleMessage(cMessage *msg)
@@ -28,7 +34,7 @@ void RadioInterface::handleMessage(cMessage *msg)
         handlePacket(pkt);
     else if(HandoverResponse *res = dynamic_cast<HandoverResponse *>(msg))
         // Forward HandoverResponse to the vehicle's Handover System
-        transmitPacket(res);
+        send(res, "handoverIO");
     else
         throw cRuntimeError("[Vehicle:RI]: received an unknown message type");
 }
@@ -39,6 +45,7 @@ void RadioInterface::handlePacket(VehiclePacket *packet)
     if (isBusy) {
         // If the radio interface is busy, enqueue the packet
         packetQueue.insert(packet);
+        emit(queueLengthSignal, packetQueue.getLength());
     } else {
         // If the radio interface is free, send the packet immediately
         transmitPacket(packet);
@@ -52,6 +59,7 @@ void RadioInterface::endTransmission()
     if (!packetQueue.isEmpty()) {
         // If there are packets in the queue, dequeue the next packet and send it
         VehiclePacket *nextPacket = check_and_cast<VehiclePacket *>(packetQueue.pop());
+        emit(queueLengthSignal, packetQueue.getLength());
         transmitPacket(nextPacket);
     } else {
         // If there are no packets in the queue, mark the interface as not busy
@@ -69,7 +77,7 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
         throw cRuntimeError("[Vehicle:RI]: MobilitySystem submodule not found");
     }
     double position = mobilitySystem->getPosition();
-    double currentBSPosition = mobilitySystem->getIdBS() * (L / N);
+    double currentBSPosition = mobilitySystem->getIdBS() * (L / N - 1);
     double distance = std::abs(position - currentBSPosition);
     // Need to account the distance from the road to the base station
     distance = std::sqrt(distance * distance + BSRoadOffset * BSRoadOffset);
@@ -78,7 +86,11 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
     double transmissionTime = alpha * distance * distance;
 
     // Send the packet to the base station through the antenna output
-    sendDirect(packet, transmissionTime, "antenna$o");
+    BaseStation *baseStation = getParentModule()->getSubmodule("baseStation", mobilitySystem->getIdBS());
+    if (!baseStation) {
+        throw cRuntimeError("[Vehicle:RI]: BaseStation submodule not found");
+    }
+    sendDirect(packet, transmissionTime, SimTime::ZERO, baseStation, "wirelessGate");
     // Schedule the end transmission event after the transmission time
     scheduleAt(simTime() + transmissionTime, endTransmissionEvent);
 }

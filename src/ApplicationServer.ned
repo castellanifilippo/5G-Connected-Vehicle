@@ -8,5 +8,5 @@ simple ApplicationServer
         @statistic[endToEndDelay](title="end-to-end delay of application packets"; unit=s;
                                   record=mean,max,vector);
     gates:
-        input in;
+        input in[];
 }

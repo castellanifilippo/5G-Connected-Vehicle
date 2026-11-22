@@ -1,4 +1,5 @@
 #include "MobilitySystem.h"
+#include <cmath>
 
 namespace _5g_connectedvehicle {
 
@@ -8,7 +9,8 @@ void MobilitySystem::initialize()
 {
     speed = par("speed").doubleValue(); 
     idBS = par("idBS").intValue();
-    L = par("highway-length").doubleValue();
+    BSRoadOffset = par("BSRoadOffset").doubleValue();
+    L = par("L").doubleValue();
 }
 
 // Function that return the current position of the vehicle based on its speed and the simulation time
