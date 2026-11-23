@@ -32,6 +32,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
 OBJS = \
+    $O/Application.o \
     $O/ApplicationServer.o \
     $O/BaseStation.o \
     $O/HandoverSystem.o \

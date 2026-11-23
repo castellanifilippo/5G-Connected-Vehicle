@@ -12,7 +12,7 @@ simple RadioInterface
                                 interpolationmode=sample-hold; record=timeavg, max, vector);
     gates:
         input in; // Gate to communicate with the BaseStation
-        //input applicationIn; // Gate to communicate with the Application
+        input applicationIn; // Gate to communicate with the Application
         inout handoverIO; // Gate to communicate with the Handover System
 
 }

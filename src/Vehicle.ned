@@ -8,7 +8,9 @@ module Vehicle
         handoverSystem: HandoverSystem;
         mobilitySystem: MobilitySystem;
         radioInterface: RadioInterface;
+        application: Application;
     connections:
         radioInterface.in <-- wirelessGate;
         handoverSystem.io <--> radioInterface.handoverIO;
+        radioInterface.applicationIn <-- application.out;
 }
