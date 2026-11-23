@@ -21,6 +21,9 @@ private:
     bool isBusy; // Flag to indicate if the radio interface is currently busy transmitting
 
     simsignal_t queueLengthSignal; // Signal to record the length of the packet queue
+    simsignal_t waitingTimeSignal; // Signal to record the waiting time of packets
+    simsignal_t serviceTimeSignal; // Signal to record the service time of packets
+    simsignal_t utilizationSignal; // Signal to record the utilization of the radio interface
 
     // Function that handles incoming VehiclePacket messages incoming
     void handlePacket(VehiclePacket *packet);

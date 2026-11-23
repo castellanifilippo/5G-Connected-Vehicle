@@ -14,6 +14,7 @@ void MobilitySystem::initialize()
     isd = L / (N - 1); // Calculate the inter-site distance
     optimalBS = par("idBS").intValue();
     direction = 1; // Start moving forward
+    idealHandover = par("idealHandover").boolValue();
     
     subOptimalSignal = registerSignal("subOptimal");
     emit(subOptimalSignal, 0L);
@@ -43,7 +44,7 @@ void MobilitySystem::setIdBS(int newIdBS)
 {
     idBS = newIdBS;
     // Emit the sub-optimal signal whenever the base station ID changes
-    emit(subOptimalSignal, (idBS != optimalBS) ? 1L : 0L);
+    emit(subOptimalSignal, (getIdBS() != optimalBS) ? 1L : 0L);
 }
 
 void MobilitySystem::handleMessage(cMessage *msg)
@@ -57,7 +58,7 @@ void MobilitySystem::handleMessage(cMessage *msg)
         }
         
         // emit signal to indicate non optimal situation
-        emit(subOptimalSignal, (idBS != optimalBS) ? 1L : 0L);
+        emit(subOptimalSignal, (getIdBS() != optimalBS) ? 1L : 0L);
         scheduleAt(simTime() + (isd / speed), boundaryEvent);
     } else {
         throw cRuntimeError("[Vehicle:MS]: received an unknown message type");

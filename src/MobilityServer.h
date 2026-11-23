@@ -12,8 +12,9 @@ class MobilityServer : public cSimpleModule
 private:
     double L;  // length of the highway
     int N;  // number of base stations
-private:
-    int closestBS(double position, int currentBS);
+    double isd;  // inter-site distance between base stations
+    
+    int closestBS(double position);
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;

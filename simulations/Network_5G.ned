@@ -7,6 +7,7 @@ network Network_5G
     parameters:
         double L @unit(m); // Highway length
         int N; // Number of BS
+        double backhaulDelay @unit(s) = default(0.002s); // Backhaul delay between BS
         @display("bgb=900,400");
     submodules:
         applicationServer: ApplicationServer {
@@ -23,7 +24,7 @@ network Network_5G
         }
     connections:
         for i = 0..N-1 {
-            bs[i].asOut --> { delay = 2ms; } --> applicationServer.in++;
-            bs[i].msIO <--> { delay = 2ms; } <--> mobilityServer.io++;
+            bs[i].asOut --> { delay = parent.backhaulDelay; } --> applicationServer.in++;
+            bs[i].msIO <--> { delay = parent.backhaulDelay; } <--> mobilityServer.io++;
         }
 }

@@ -7,6 +7,9 @@ simple HandoverSystem
         @signal[handoverDelay](type=simtime_t);
         @statistic[handoverDelay](title="handover delay"; unit=s;
                                   record=mean,max,vector);
+        @signal[handoverCount](type=long);
+        @statistic[handoverCount](title="number of handovers";
+                                  record=count);
     gates:
         inout io; // Gate to communicate with the RadioInterface
 }

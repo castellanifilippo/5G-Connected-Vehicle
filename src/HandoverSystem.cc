@@ -11,8 +11,14 @@ void HandoverSystem::initialize()
 {
     H = par("H").doubleValue();
     this->handoverTimer = new cMessage("handoverTimer");
-    scheduleAt(simTime() + H, handoverTimer);
+
+    // Schedule the first handover packet if H is greater than 0 and not in ideal handover mode
+    bool idealHandover = getParentModule()->getSubmodule("mobilitySystem")->par("idealHandover").boolValue();
+    if (!idealHandover && H > 0) {
+        scheduleAt(simTime() + H, handoverTimer);
+    }
     this->handoverDelaySignal = registerSignal("handoverDelay");
+    this->handoverCountSignal = registerSignal("handoverCount");
 }
 
 void HandoverSystem::handleMessage(cMessage *msg)
@@ -37,6 +43,12 @@ void HandoverSystem::handleMessage(cMessage *msg)
         
     } else if (HandoverResponse *handoverPacket = dynamic_cast<HandoverResponse *>(msg)) {
         int BSId = handoverPacket->getNewBaseStationId();
+
+        if(BSId != mobilitySystem->getIdBS()) {
+            // Emit the handover count signal
+            emit(handoverCountSignal, 1L);
+        }
+
         // Update the current base station in the MobilitySystem
         mobilitySystem->setIdBS(BSId);
         

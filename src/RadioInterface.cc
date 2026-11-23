@@ -23,6 +23,12 @@ void RadioInterface::initialize()
     // Register the queue length signal
     queueLengthSignal = registerSignal("queueLength");
     emit(queueLengthSignal, packetQueue.getLength());
+    // Register the waiting time and service time signals
+    waitingTimeSignal = registerSignal("waitingTime");
+    serviceTimeSignal = registerSignal("serviceTime");
+    // Register the utilization signal
+    utilizationSignal = registerSignal("utilization");
+    emit(utilizationSignal, isBusy ? 1L : 0L);
 }
 
 void RadioInterface::handleMessage(cMessage *msg)
@@ -67,13 +73,18 @@ void RadioInterface::endTransmission()
     } else {
         // If there are no packets in the queue, mark the interface as not busy
         isBusy = false;
+        emit(utilizationSignal, 0L);
     }
 }
 
 // Function to transmit a packet and hadle trasmission time
 void RadioInterface::transmitPacket(VehiclePacket *packet)
 {   
-    isBusy = true;
+    // Mark as busy and emit the utilization signal
+    if(!isBusy) {
+        isBusy = true;
+        emit(utilizationSignal, 1L);
+    }
 
     // Get the distance to the base station from the mobility system
     MobilitySystem *mobilitySystem = check_and_cast<MobilitySystem *>(getParentModule()->getSubmodule("mobilitySystem"));
@@ -81,17 +92,27 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
         throw cRuntimeError("[Vehicle:RI]: MobilitySystem submodule not found");
     }
 
+    // Calculate the position of the current base station
+    int servingBS = mobilitySystem->getIdBS();
+    double currentBSPosition = servingBS * (L / (N - 1));
+
     double position = mobilitySystem->getPosition();
-    double currentBSPosition = mobilitySystem->getIdBS() * (L / (N - 1));
     double distance = std::abs(position - currentBSPosition);
     // Need to account the distance from the road to the base station
     distance = std::sqrt(distance * distance + BSRoadOffset * BSRoadOffset);
 
     // Calculate the transmission time based on the distance to the base station S = alpha * distance^2
-    double transmissionTime = alpha * distance * distance;
+    simtime_t transmissionTime = alpha * distance * distance;
 
+    // Emit the service time and waiting time signals
+    if(packet->getType() == PacketType::APP_PACKET) {
+        emit(serviceTimeSignal, transmissionTime);
+        simtime_t waitingTime = simTime() - packet->getGenTime();
+        emit(waitingTimeSignal, waitingTime);
+    }
+    
     // Send the packet to the base station through the antenna output
-    cModule *baseStation = getParentModule()->getParentModule()->getSubmodule("bs", mobilitySystem->getIdBS());
+    cModule *baseStation = getParentModule()->getParentModule()->getSubmodule("bs", servingBS);
     if (!baseStation) {
         throw cRuntimeError("[Vehicle:RI]: BaseStation submodule not found");
     }

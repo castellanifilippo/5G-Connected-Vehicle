@@ -12,6 +12,7 @@ private:
     double speed; // Speed of the vehicle in m/s
     int idBS; // ID of the base station the vehicle is currently connected to
     double L; // Length of the highway
+    bool idealHandover; // If true, the radio always uses the nearest base station
 
     // All the below attributes are used to calculate the sub-optimal ratio
     int N; // Number of base stations
@@ -27,8 +28,10 @@ protected:
 public:
     // Getters and Setters used by the other vehicle's modules
     double getSpeed() const { return speed; }
-    int getIdBS() const { return idBS; }
+    int getIdBS() const { return idealHandover ? optimalBS : idBS; }
     void setIdBS(int newIdBS);
+    int getOptimalBS() const { return optimalBS; }
+    bool isIdealHandover() const { return idealHandover; }
     // Calculate on time the position so we don't have to update it every time we move the vehicle
     // We can use the speed and the simulation time to calculate the position of the vehicle on the highway
     double getPosition();

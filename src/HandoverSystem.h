@@ -13,6 +13,7 @@ private:
     simtime_t H; // Interval between handover packets
     cMessage *handoverTimer;
     simsignal_t handoverDelaySignal; // Signal to record the handover delay
+    simsignal_t handoverCountSignal; // Signal to record the number of handovers
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
