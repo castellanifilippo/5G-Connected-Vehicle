@@ -22,6 +22,8 @@ private:
     int direction; // Direction of the vehicle (1 for forward, -1 for backward)
     cMessage *boundaryEvent; // Event segnaling when the vehicle reach the bound between two base stations
     simsignal_t subOptimalSignal; // Signal to record sub-optimal association events
+    
+    simsignal_t servingBSSignal; // Signal to record the current serving base station ID
 
 protected:
     virtual void initialize() override;

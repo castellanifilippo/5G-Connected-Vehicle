@@ -26,6 +26,9 @@ void MobilitySystem::initialize()
     subOptimalSignal = registerSignal("subOptimal");
     emit(subOptimalSignal, 0L);
 
+    servingBSSignal = registerSignal("servingBS");
+    emit(servingBSSignal, idBS);
+
     boundaryEvent = new cMessage("boundaryEvent");
     // Schedule the first boundary event based on the vehicle's speed
     if(speed > 0 && N > 1) {
@@ -50,10 +53,14 @@ double MobilitySystem::getPosition()
 }
 
 void MobilitySystem::setIdBS(int newIdBS)
-{
-    idBS = newIdBS;
-    // Emit the sub-optimal signal whenever the base station ID changes
-    emit(subOptimalSignal, (getIdBS() != optimalBS) ? 1L : 0L);
+{   
+    if(newIdBS != idBS) {
+        idBS = newIdBS;
+        // Emit the serving base station signal whenever the base station ID changes
+        emit(servingBSSignal, getIdBS());
+        // Emit the sub-optimal signal whenever the base station ID changes
+        emit(subOptimalSignal, (getIdBS() != optimalBS) ? 1L : 0L);
+    }
 }
 
 void MobilitySystem::handleMessage(cMessage *msg)
@@ -69,6 +76,11 @@ void MobilitySystem::handleMessage(cMessage *msg)
         // emit signal to indicate non optimal situation
         emit(subOptimalSignal, (getIdBS() != optimalBS) ? 1L : 0L);
         scheduleAt(simTime() + (isd / speed), boundaryEvent);
+
+        // Emit the serving bs in case we are in the optimal situation
+        if(idealHandover) {
+            emit(servingBSSignal, getIdBS());
+        }
     } else {
         throw cRuntimeError("[Vehicle:MS]: received an unknown message type");
     }

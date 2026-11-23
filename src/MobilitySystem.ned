@@ -11,4 +11,9 @@ simple MobilitySystem
         @statistic[subOptimal](title="Sub-optimal association ratio";
                                interpolationmode=sample-hold;
                                record=timeavg,vector);
+        @signal[servingBS](type=long);
+        @statistic[servingBS](title="current Serving Base Station ID";
+                               interpolationmode=sample-hold;
+                               record=vector);
+                               
 }

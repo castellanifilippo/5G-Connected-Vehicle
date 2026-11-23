@@ -154,9 +154,9 @@ Maintains vehicle kinematics, serving BS association, the `idealHandover` benchm
   * Schedules a self-message `boundaryEvent` at the exact first cell-midpoint crossing distance:
     $$\Delta x_{\text{first}} = \begin{cases} (L - x_0) + 0.5\,\text{ISD} & \text{if } \text{optimalBS} = N - 1 \\ (\text{optimalBS} + 0.5)\,\text{ISD} - x_0 & \text{otherwise} \end{cases}$$
     and reschedules it strictly every $\text{ISD} / V$ seconds thereafter (since bouncing at $x = 0$ or $x = L$ adds $0.5\,\text{ISD} + 0.5\,\text{ISD} = 1\,\text{ISD}$ between consecutive midpoint crossings).
-  * On each `boundaryEvent`, updates `optimalBS += direction`, flips `direction` at `0` or `N - 1`, and emits `(getIdBS() != optimalBS) ? 1L : 0L`.
-  * `setIdBS(int newIdBS)` updates `idBS` and immediately emits `(getIdBS() != optimalBS) ? 1L : 0L`.
-  * Using `getIdBS()` ensures `subOptimal` stays identically `0` when `idealHandover == true`.
+  * On each `boundaryEvent`, updates `optimalBS += direction`, flips `direction` at `0` or `N - 1`, and emits `(getIdBS() != optimalBS) ? 1L : 0L` (plus `servingBS` when `idealHandover == true`).
+  * `setIdBS(int newIdBS)` updates `idBS` when `newIdBS != idBS` and immediately emits both `servingBS` (`getIdBS()`) and `subOptimal` (`(getIdBS() != optimalBS) ? 1L : 0L`).
+  * Using `getIdBS()` ensures `subOptimal` stays identically `0` and `servingBS` accurately tracks `optimalBS` when `idealHandover == true`.
 * **Public API for Sibling Modules:** `getSpeed()`, `getIdBS()`, `setIdBS(int)`, `getOptimalBS()`, `isIdealHandover()`, `getPosition()`.
 * **Cleanup (`finish()`):** Calls `cancelAndDelete(boundaryEvent)`.
 
@@ -261,6 +261,7 @@ All performance indicators are collected via OMNeT++'s `@signal` / `@statistic` 
 | Handover Latency ($D_{\text{ho}}$) | `HandoverSystem` | `handoverDelay` | `simtime_t` | `s` | — (event) | `mean`, `max`, `vector` | Round-trip `simTime() - res->getRequestTime()` upon reply arrival at `HandoverSystem`. |
 | Effective Handover Count ($N_{\text{ho}}$) | `HandoverSystem` | `handoverCount` | `long` | — | — (event) | `count` | Total number of actual serving-BS switches (`newBaseStationId != getIdBS()`). |
 | Sub-Optimal Association Ratio ($\eta_{\text{sub}}$) | `MobilitySystem` | `subOptimal` | `long` | — | `sample-hold` | `timeavg`, `vector` | Binary indicator (`1` if `getIdBS() != optimalBS`, `0` otherwise); `timeavg` yields $\eta_{\text{sub}}$. |
+| Current Serving BS ID | `MobilitySystem` | `servingBS` | `long` | — | `sample-hold` | `vector` | Active serving BS index emitted at $t = 0$ and on every actual serving-BS change (both normal and `idealHandover` modes). |
 
 ---
 
