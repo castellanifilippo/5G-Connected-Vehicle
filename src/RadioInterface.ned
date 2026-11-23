@@ -3,8 +3,6 @@ package _5g_connectedvehicle;
 simple RadioInterface
 {   
     parameters:
-        double L @unit(m); // Highway length
-        int N; // Number of BS
         double BSRoadOffset @unit(m); // Distance from the road to the base station
         double alpha; // Proportionality constant for the propagation model
         @signal[queueLength](type=long);

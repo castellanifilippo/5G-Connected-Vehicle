@@ -4,10 +4,8 @@ simple MobilitySystem
 {
     parameters:
         double speed @unit(mps); // Vehicle speed
-        int idBS;
-        double L @unit(m);
-        int N;
         bool idealHandover = default(false); // If true, the radio always use the nearest bs
+        double initialPosition @unit(m) = default(0m); // Initial position of the vehicle
         
         @signal[subOptimal](type=long);
         @statistic[subOptimal](title="Sub-optimal association ratio";

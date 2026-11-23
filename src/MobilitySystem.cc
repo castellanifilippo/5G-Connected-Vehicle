@@ -1,5 +1,6 @@
 #include "MobilitySystem.h"
 #include <cmath>
+#include <algorithm>
 
 namespace _5g_connectedvehicle {
 
@@ -8,21 +9,29 @@ Define_Module(MobilitySystem);
 void MobilitySystem::initialize()
 {
     speed = par("speed").doubleValue(); 
-    idBS = par("idBS").intValue();
-    L = par("L").doubleValue();
-    N = par("N").intValue();
-    isd = L / (N - 1); // Calculate the inter-site distance
-    optimalBS = par("idBS").intValue();
-    direction = 1; // Start moving forward
+    initialPosition = par("initialPosition").doubleValue();
+    L = getSystemModule()->par("L").doubleValue();
+    N = getSystemModule()->par("N").intValue();
     idealHandover = par("idealHandover").boolValue();
-    
+
+    // Calculate the inter-site distance
+    isd = (N > 1) ? L / (N - 1) : 0.0;
+    // Calculate the optimal base station based on the initial position
+    optimalBS = (N > 1) ? std::clamp(static_cast<int>(std::round(initialPosition / isd)), 0, N - 1) : 0;
+    idBS = optimalBS; // Initially, the vehicle is connected to the optimal base station
+    // We assume rigth as the positive base direction
+    // if the optimal base station is the last one, we need to move backward, otherwise we move forward
+    direction = (optimalBS == N - 1) ? -1 : 1;
+
     subOptimalSignal = registerSignal("subOptimal");
     emit(subOptimalSignal, 0L);
 
     boundaryEvent = new cMessage("boundaryEvent");
     // Schedule the first boundary event based on the vehicle's speed
     if(speed > 0 && N > 1) {
-        scheduleAt(simTime() + ((0.5 * isd) / std::abs(speed)), boundaryEvent);
+        // Calculate the distance to the first boundary based on the initial position and the optimal base station
+        double distToFirstBoundary = (optimalBS == N - 1) ? (L - initialPosition) + 0.5 * isd : (optimalBS + 0.5) * isd - initialPosition;
+        scheduleAt(simTime() + (distToFirstBoundary / speed), boundaryEvent);
     }
 }
 
@@ -30,7 +39,7 @@ void MobilitySystem::initialize()
 double MobilitySystem::getPosition()
 {
     simtime_t currentTime = simTime();
-    double totalDistance = speed * currentTime.dbl();
+    double totalDistance = initialPosition + speed * currentTime.dbl();
     // use fmod to ensure the position wraps around the highway length
     double position = fmod(totalDistance, 2 * L);
     // Reflect the position if it exceeds the highway length
@@ -64,4 +73,8 @@ void MobilitySystem::handleMessage(cMessage *msg)
         throw cRuntimeError("[Vehicle:MS]: received an unknown message type");
     }
 }
+
+void MobilitySystem::finish()
+{
+    cancelAndDelete(boundaryEvent);
 }

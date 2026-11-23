@@ -10,8 +10,8 @@ Define_Module(RadioInterface);
 
 void RadioInterface::initialize()
 {
-    L = par("L").doubleValue();
-    N = par("N").intValue();
+    L = getSystemModule()->par("L").doubleValue();
+    N = getSystemModule()->par("N").intValue();
     BSRoadOffset = par("BSRoadOffset").doubleValue();
     alpha = par("alpha").doubleValue();
 

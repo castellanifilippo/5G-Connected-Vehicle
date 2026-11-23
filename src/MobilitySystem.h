@@ -13,6 +13,7 @@ private:
     int idBS; // ID of the base station the vehicle is currently connected to
     double L; // Length of the highway
     bool idealHandover; // If true, the radio always uses the nearest base station
+    double initialPosition; // Initial position of the vehicle
 
     // All the below attributes are used to calculate the sub-optimal ratio
     int N; // Number of base stations
@@ -25,6 +26,7 @@ private:
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void finish() override;
 public:
     // Getters and Setters used by the other vehicle's modules
     double getSpeed() const { return speed; }
