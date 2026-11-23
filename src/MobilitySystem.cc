@@ -20,7 +20,7 @@ void MobilitySystem::initialize()
     }
     
     subOptimalSignal = registerSignal("subOptimal");
-    emit(subOptimalSignal, 0);
+    emit(subOptimalSignal, 0L);
 
     boundaryEvent = new cMessage("boundaryEvent");
     // Schedule the first boundary event based on the vehicle's speed
