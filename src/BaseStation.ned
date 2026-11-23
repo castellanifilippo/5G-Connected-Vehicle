@@ -3,7 +3,6 @@ package _5g_connectedvehicle;
 simple BaseStation
 {
     parameters:
-        @display("i=device/antennatower;is=s");
         double delay @unit(s);
     gates:
         inout msIO; // Gate to communicate with the MobilityServer

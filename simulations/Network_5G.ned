@@ -7,11 +7,20 @@ network Network_5G
     parameters:
         double L @unit(m); // Highway length
         int N; // Number of BS
+        @display("bgb=900,400");
     submodules:
-        vehicle: Vehicle;
-        bs[N]: BaseStation;
-        mobilityServer: MobilityServer;
-        applicationServer: ApplicationServer;
+        applicationServer: ApplicationServer {
+            @display("p=300,70;i=device/server;is=s");
+        }
+        mobilityServer: MobilityServer {
+            @display("p=600,70;i=device/server2;is=s");
+        }
+        bs[N]: BaseStation {
+            @display("p=70,220,r,75;i=device/antennatower;is=s");
+        }
+        vehicle: Vehicle {
+            @display("p=450,330;i=device/pocketpc;is=s");
+        }
     connections:
         for i = 0..N-1 {
             bs[i].asOut --> { delay = 2ms; } --> applicationServer.in++;

@@ -3,7 +3,6 @@ package _5g_connectedvehicle;
 simple ApplicationServer
 {   
     parameters:
-        @display("i=device/server;is=s");
         @signal[endToEndDelay](type=simtime_t);
         @statistic[endToEndDelay](title="end-to-end delay of application packets"; unit=s;
                                   record=mean,max,vector);

@@ -12,12 +12,21 @@ private:
     double speed; // Speed of the vehicle in m/s
     int idBS; // ID of the base station the vehicle is currently connected to
     double L; // Length of the highway
+    // All the below parameters are used to calculate the sub-optimal ratio
+    int N; // Number of base stations
+    double isd; // Inter-site distance between base stations
+    int optimalBS; // ID of the optimal base station for the vehicle
+    int direction; // Direction of the vehicle (1 for forward, -1 for backward)
+    cMessage *boundaryEvent; // Event segnaling when the vehicle reach the bound between two base stations
+    simsignal_t subOptimalSignal; // Signal to record sub-optimal association events
+
 protected:
     virtual void initialize() override;
+    virtual void handleMessage(cMessage *msg) override;
 public:
     double getSpeed() const { return speed; }
     int getIdBS() const { return idBS; }
-    void setIdBS(int newIdBS) { idBS = newIdBS; }
+    void setIdBS(int newIdBS);
     // Calculate on time the position so we don't have to update it every time we move the vehicle
     // We can use the speed and the simulation time to calculate the position of the vehicle on the highway
     double getPosition();
