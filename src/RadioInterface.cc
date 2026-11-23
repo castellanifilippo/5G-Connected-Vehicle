@@ -14,6 +14,7 @@ void RadioInterface::initialize()
     N = getSystemModule()->par("N").intValue();
     BSRoadOffset = par("BSRoadOffset").doubleValue();
     alpha = par("alpha").doubleValue();
+    isd = (N > 1) ? L / (N - 1) : 0.0;
 
     // Initialize the packet queue and the end transmission event
     packetQueue.setName("vehicleQueue");
@@ -94,7 +95,7 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
 
     // Calculate the position of the current base station
     int servingBS = mobilitySystem->getIdBS();
-    double currentBSPosition = servingBS * (L / (N - 1));
+    double currentBSPosition = servingBS * isd;
 
     double position = mobilitySystem->getPosition();
     double distance = std::abs(position - currentBSPosition);

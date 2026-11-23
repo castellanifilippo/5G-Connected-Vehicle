@@ -78,3 +78,5 @@ void MobilitySystem::finish()
 {
     cancelAndDelete(boundaryEvent);
 }
+
+}

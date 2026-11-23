@@ -15,6 +15,7 @@ private:
     int N; // Number of BS
     double BSRoadOffset; // Distance from the road to the base station
     double alpha; // Proportionality constant for the propagation model
+    double isd; // Inter-site distance between base stations
 
     cQueue packetQueue; // Queue to hold packets waiting to be sent
     cMessage *endTransmissionEvent; // Self-message to indicate the end of a transmission

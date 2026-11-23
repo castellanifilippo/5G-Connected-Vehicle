@@ -35,7 +35,6 @@ void HandoverSystem::handleMessage(cMessage *msg)
         handoverPacket->setType(PacketType::HANDOVER_PACKET);
         handoverPacket->setGenTime(simTime());
         handoverPacket->setGenTimePosition(mobilitySystem->getPosition());
-        handoverPacket->setCurrentBS(mobilitySystem->getIdBS());
         send(handoverPacket, "io$o");
 
         // Reschedule the handover timer for the next interval
