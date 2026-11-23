@@ -27,6 +27,7 @@ void MobilityServer::handleMessage(cMessage *msg)
     HandoverResponse *res = new HandoverResponse("handoverResponse");
     res->setNewBaseStationId(newServingBS);
     res->setRequestTime(pkt->getGenTime());
+    
     // Send the response back to the vehicle using the same gate index as the incoming packet
     send(res, "io$o", pkt->getArrivalGate()->getIndex());
     delete pkt;

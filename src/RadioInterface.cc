@@ -14,10 +14,12 @@ void RadioInterface::initialize()
     N = par("N").intValue();
     BSRoadOffset = par("BSRoadOffset").doubleValue();
     alpha = par("alpha").doubleValue();
+
     // Initialize the packet queue and the end transmission event
     packetQueue.setName("vehicleQueue");
     endTransmissionEvent = new cMessage("endTransmissionEvent");
     isBusy = false;
+
     // Register the queue length signal
     queueLengthSignal = registerSignal("queueLength");
     emit(queueLengthSignal, packetQueue.getLength());
@@ -72,11 +74,13 @@ void RadioInterface::endTransmission()
 void RadioInterface::transmitPacket(VehiclePacket *packet)
 {   
     isBusy = true;
+
     // Get the distance to the base station from the mobility system
     MobilitySystem *mobilitySystem = check_and_cast<MobilitySystem *>(getParentModule()->getSubmodule("mobilitySystem"));
     if (!mobilitySystem) {
         throw cRuntimeError("[Vehicle:RI]: MobilitySystem submodule not found");
     }
+
     double position = mobilitySystem->getPosition();
     double currentBSPosition = mobilitySystem->getIdBS() * (L / (N - 1));
     double distance = std::abs(position - currentBSPosition);
@@ -91,6 +95,7 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
     if (!baseStation) {
         throw cRuntimeError("[Vehicle:RI]: BaseStation submodule not found");
     }
+
     sendDirect(packet, transmissionTime, SimTime::ZERO, baseStation, "wirelessGate");
     // Schedule the end transmission event after the transmission time
     scheduleAt(simTime() + transmissionTime, endTransmissionEvent);
@@ -98,7 +103,6 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
 
 void RadioInterface::finish()
 {
-    // Clean up the end transmission event
     cancelAndDelete(endTransmissionEvent);
 }
 

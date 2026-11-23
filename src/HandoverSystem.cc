@@ -39,6 +39,7 @@ void HandoverSystem::handleMessage(cMessage *msg)
         int BSId = handoverPacket->getNewBaseStationId();
         // Update the current base station in the MobilitySystem
         mobilitySystem->setIdBS(BSId);
+        
         // Emit the handover delay signal
         simtime_t handoverDelay = simTime() - handoverPacket->getRequestTime();
         emit(handoverDelaySignal, handoverDelay);

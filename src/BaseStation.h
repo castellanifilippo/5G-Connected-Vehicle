@@ -12,9 +12,7 @@ class BaseStation : public cSimpleModule
   private:
     double delay; // Delay for sending handover response to the vehicle
   protected:
-    virtual void initialize() override {
-        delay = par("delay").doubleValue();
-    }
+    virtual void initialize() override { delay = par("delay").doubleValue(); }
     virtual void handleMessage(cMessage *msg) override;
 };
 

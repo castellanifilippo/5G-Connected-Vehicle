@@ -12,6 +12,7 @@ class Application : public cSimpleModule
 private:
     cMessage *sendPacketEvent; // Event to trigger packet sending
 private:
+    // Function to abstract the inter-arrival time
     simtime_t getInterArrivalTime() { return par("interArrivalTime").doubleValue(); }
 protected:
     virtual void initialize() override;

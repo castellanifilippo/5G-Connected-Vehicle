@@ -13,11 +13,7 @@ void MobilitySystem::initialize()
     N = par("N").intValue();
     isd = L / (N - 1); // Calculate the inter-site distance
     optimalBS = par("idBS").intValue();
-    if(speed > 0) {
-        direction = 1; // Forward
-    } else {
-        direction = -1; // Backward
-    }
+    direction = 1; // Start moving forward
     
     subOptimalSignal = registerSignal("subOptimal");
     emit(subOptimalSignal, 0L);
@@ -59,6 +55,7 @@ void MobilitySystem::handleMessage(cMessage *msg)
         } else if(optimalBS == 0){
             direction = 1; // Change direction to forward
         }
+        
         // emit signal to indicate non optimal situation
         emit(subOptimalSignal, (idBS != optimalBS) ? 1L : 0L);
         scheduleAt(simTime() + (isd / speed), boundaryEvent);

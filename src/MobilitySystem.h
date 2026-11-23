@@ -12,7 +12,8 @@ private:
     double speed; // Speed of the vehicle in m/s
     int idBS; // ID of the base station the vehicle is currently connected to
     double L; // Length of the highway
-    // All the below parameters are used to calculate the sub-optimal ratio
+
+    // All the below attributes are used to calculate the sub-optimal ratio
     int N; // Number of base stations
     double isd; // Inter-site distance between base stations
     int optimalBS; // ID of the optimal base station for the vehicle
@@ -24,6 +25,7 @@ protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
 public:
+    // Getters and Setters used by the other vehicle's modules
     double getSpeed() const { return speed; }
     int getIdBS() const { return idBS; }
     void setIdBS(int newIdBS);
