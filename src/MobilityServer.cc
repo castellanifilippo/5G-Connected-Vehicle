@@ -2,6 +2,7 @@
 #include "VehiclePacket_m.h"
 #include "HandoverResponse_m.h"
 #include <cmath>
+#include <limits>
 
 namespace _5g_connectedvehicle {
 
@@ -40,16 +41,15 @@ int MobilityServer::closestBS(double position, int currentBS)
     // To find the nearest BS, we calculate the distance to the current BS and the next BS in both directions
     // We do not consider the road/bs offset, as the BSs are assumed to be evenly spaced along the highway
     double distance[3];
-    distance[1] = fabs(position - (currentBS * (L / N - 1))); // Distance to current BS
+    distance[1] = fabs(position - (currentBS * (L / (N - 1)))); // Distance to current BS
     if(currentBS > 0)
-        distance[0] = fabs(position - ((currentBS - 1) * (L / N - 1))); // Distance to previous BS
+        distance[0] = fabs(position - ((currentBS - 1) * (L / (N - 1)))); // Distance to previous BS
     else
         distance[0] = std::numeric_limits<double>::infinity(); // No previous BS, set to infinity
-    if(currentBS < N - 1)
-        distance[2] = fabs(position - ((currentBS + 1) * (L / N - 1))); // Distance to next BS
+    if(currentBS < (N - 1))
+        distance[2] = fabs(position - ((currentBS + 1) * (L / (N - 1)))); // Distance to next BS
     else
         distance[2] = std::numeric_limits<double>::infinity(); // No next BS, set to infinity
-    distance[1] = fabs(position - (currentBS * (L / N - 1))); // Distance to current BS
 
     // Find the index of the minimum distance
     int closestBSIndex = 0;
@@ -71,7 +71,7 @@ int MobilityServer::closestBS(double position, int currentBS)
     double distanceToClosest = distance[closestBSIndex];
     while(i < N && i >= 0)
     {
-        double dist = fabs(position - (i * (L / N - 1)));
+        double dist = fabs(position - (i * (L / (N - 1))));
         if(dist > distanceToClosest)
             break;
         distanceToClosest = dist;
@@ -79,7 +79,7 @@ int MobilityServer::closestBS(double position, int currentBS)
     }
 
     // Return the closest BS found
-    return i;
+    return i - incr; // Subtract incr to get the last valid BS index
 }
 
 }

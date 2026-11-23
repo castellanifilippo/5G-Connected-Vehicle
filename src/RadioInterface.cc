@@ -2,6 +2,7 @@
 #include "MobilitySystem.h"
 #include "HandoverResponse_m.h"
 #include "VehiclePacket_m.h"
+#include <cmath>
 
 namespace _5g_connectedvehicle {
 
@@ -34,7 +35,7 @@ void RadioInterface::handleMessage(cMessage *msg)
         handlePacket(pkt);
     else if(HandoverResponse *res = dynamic_cast<HandoverResponse *>(msg))
         // Forward HandoverResponse to the vehicle's Handover System
-        send(res, "handoverIO");
+        send(res, "handoverIO$o");
     else
         throw cRuntimeError("[Vehicle:RI]: received an unknown message type");
 }
@@ -77,7 +78,7 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
         throw cRuntimeError("[Vehicle:RI]: MobilitySystem submodule not found");
     }
     double position = mobilitySystem->getPosition();
-    double currentBSPosition = mobilitySystem->getIdBS() * (L / N - 1);
+    double currentBSPosition = mobilitySystem->getIdBS() * (L / (N - 1));
     double distance = std::abs(position - currentBSPosition);
     // Need to account the distance from the road to the base station
     distance = std::sqrt(distance * distance + BSRoadOffset * BSRoadOffset);
@@ -86,7 +87,7 @@ void RadioInterface::transmitPacket(VehiclePacket *packet)
     double transmissionTime = alpha * distance * distance;
 
     // Send the packet to the base station through the antenna output
-    BaseStation *baseStation = getParentModule()->getSubmodule("baseStation", mobilitySystem->getIdBS());
+    cModule *baseStation = getParentModule()->getParentModule()->getSubmodule("bs", mobilitySystem->getIdBS());
     if (!baseStation) {
         throw cRuntimeError("[Vehicle:RI]: BaseStation submodule not found");
     }

@@ -1,6 +1,7 @@
 #include "HandoverSystem.h"
 #include "VehiclePacket_m.h"
 #include "HandoverResponse_m.h"
+#include "MobilitySystem.h"
 
 namespace _5g_connectedvehicle {
 
@@ -19,7 +20,7 @@ void HandoverSystem::handleMessage(cMessage *msg)
     // Get the MobilitySystem module from the parent module
     MobilitySystem *mobilitySystem = check_and_cast<MobilitySystem *>(getParentModule()->getSubmodule("mobilitySystem"));
     if (mobilitySystem == nullptr) {
-        throw cRuntimeError("[MobilityServer]: MobilitySystem module not found");
+        throw cRuntimeError("[HandoverSystem]: MobilitySystem module not found");
     }
 
     if (msg == handoverTimer) {
@@ -39,7 +40,7 @@ void HandoverSystem::handleMessage(cMessage *msg)
         // Update the current base station in the MobilitySystem
         mobilitySystem->setIdBS(BSId);
         // Emit the handover delay signal
-        simtime_t handoverDelay = simTime() - handoverPacket->getGenTime();
+        simtime_t handoverDelay = simTime() - handoverPacket->getRequestTime();
         emit(handoverDelaySignal, handoverDelay);
         delete handoverPacket; // Clean up the received packet
     } else {

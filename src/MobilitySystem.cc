@@ -9,7 +9,6 @@ void MobilitySystem::initialize()
 {
     speed = par("speed").doubleValue(); 
     idBS = par("idBS").intValue();
-    BSRoadOffset = par("BSRoadOffset").doubleValue();
     L = par("L").doubleValue();
 }
 

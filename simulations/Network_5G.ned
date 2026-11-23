@@ -13,6 +13,8 @@ network Network_5G
         mobilityServer: MobilityServer;
         applicationServer: ApplicationServer;
     connections:
-        bs[i].asOut --> { delay = 2ms; } --> applicationServer.in[i];
-        bs[i].msIO <--> { delay = 2ms; } <--> mobilityServer.io[i];
+        for i = 0..N-1 {
+            bs[i].asOut --> { delay = 2ms; } --> applicationServer.in++;
+            bs[i].msIO <--> { delay = 2ms; } <--> mobilityServer.io++;
+        }
 }
