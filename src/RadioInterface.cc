@@ -55,11 +55,12 @@ void RadioInterface::handlePacket(VehiclePacket *packet)
     if (isBusy) {
         // If the radio interface is busy, enqueue the packet
         packetQueue.insert(packet);
-        emit(queueLengthSignal, packetQueue.getLength());
     } else {
         // If the radio interface is free, send the packet immediately
         transmitPacket(packet);
     }
+    // Emit the queue length signal after handling the packet
+    emit(queueLengthSignal, packetQueue.getLength());
 
 }
 
